@@ -1,5 +1,5 @@
-from .basic import *
+from .standard import build_prefix as standard_algorithm
 
 __all__ = [
-    "build_prefix"
+    "standard_algorithm"
 ]

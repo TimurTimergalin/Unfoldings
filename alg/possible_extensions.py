@@ -29,4 +29,4 @@ def update_possible_extensions(pe, new, transitions, co):
         m = Marking(x.place for x in co_set)
         for t in transitions:
             if is_enabled(t, m):
-                pe.append((Event(t), co_set))
+                pe.add((Event(t), co_set))

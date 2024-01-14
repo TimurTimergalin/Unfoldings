@@ -7,11 +7,12 @@ from obj import Prefix, Event, Condition
 # Строит развертку сети Петри по алгоритму МакМиллана (но с настраиваемым порядком на конфигурациях)
 # net - сеть Петри
 # m0 - начальная разметка
-# configuration_factory - тип конфигурации
-def build_prefix(net, m0, configuration_factory):
+# config_type - тип конфигурации
+def build_prefix(net, m0, settings):
     res = Prefix(net.name)  # В res будет находиться итоговый префикс
 
-    # В этом словаре разметкам будут сопоставляться минимальные локальные конфигурации с такой разметкой.
+    # В этом словаре разметкам будут сопоставляться события, локальные конфигурации которых минимальны
+    # и имеют эту разметку.
     # Он будет использоваться для того, чтобы узнать, является ли то или иное событие cut-off
     min_by_mark = {}
 
@@ -20,7 +21,7 @@ def build_prefix(net, m0, configuration_factory):
     res.add_event(e)
 
     co = Co()
-    pe = PriorityQueue(configuration_factory)
+    pe = PriorityQueue(settings.cmp_events)
 
     for p in m0.elements():  # Добавление условий, соответствующих начальной разметке
         c = Condition(p)
@@ -29,12 +30,12 @@ def build_prefix(net, m0, configuration_factory):
 
     # Обновление отношения co, очереди pe и словаря конфигураций
     co.update(e, res.places)
-    config = configuration_factory(e)
-    min_by_mark[config.mark()] = config
+    config = settings.config(e)
+    min_by_mark[config.mark()] = e
     update_possible_extensions(pe, e, net.transitions, co)
 
     while pe:  # Пока к префиксу можно добавить новые события
-        e, pre = pe.pop_min()  # Выбираем событие с минимальной длиной локальной конфигурации
+        e, pre = pe.pop()  # Выбираем событие с минимальной длиной локальной конфигурации
 
         # Добавляем к префиксу выбранное событие и ребра к нему от условий в его preset-е
         res.add_event(e)
@@ -49,11 +50,11 @@ def build_prefix(net, m0, configuration_factory):
                 petri_utils.add_arc_from_to(e, c, res)
 
         co.update(e, res.places)
-        config = configuration_factory(e)
+        config = settings.config(e)
         m = config.mark()
-        if m not in min_by_mark or min_by_mark[m] >= config:
+        if m not in min_by_mark or settings.cmp_events(min_by_mark[m], e) >= 0:
             update_possible_extensions(pe, e, net.transitions, co)
-            min_by_mark[m] = config
+            min_by_mark[m] = e
 
     # После процедуры удаляем событие bot из префикса - оно было нужно лишь при построении
     for a in bot.out_arcs:

@@ -27,9 +27,9 @@ class Co:
             else:  # Если c конкурентно со всеми условиями из preset-а нового события
                 concurrent_with.add(c)
 
-        self.pairs.update((x, y) for x, y in product(new, new) if x != y)
-        self.pairs.update((x, y) for x, y in product(new, concurrent_with) if x != y)
-        self.pairs.update((x, y) for x, y in product(concurrent_with, new) if x != y)
+        self.pairs.update((x, y) for x, y in product(new, new))
+        self.pairs.update((x, y) for x, y in product(new, concurrent_with))
+        self.pairs.update((x, y) for x, y in product(concurrent_with, new))
 
     # Перечисляет все co-set-ы, которые появились в результате добавления нового события в префикс
     # (co-set - любое множество попарно-конкурентных условий)
