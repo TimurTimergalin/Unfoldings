@@ -30,8 +30,7 @@ def build_prefix(net, m0, settings):
 
     # Обновление отношения co, очереди pe и словаря конфигураций
     co.update(e, res.places)
-    config = settings.config(e)
-    min_by_mark[config.mark()] = e
+    min_by_mark[m0] = e
     update_possible_extensions(pe, e, net.transitions, co)
 
     while pe:  # Пока к префиксу можно добавить новые события

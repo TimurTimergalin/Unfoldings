@@ -1,4 +1,4 @@
-from pm4py.objects.petri_net.obj import Marking
+from pm4py.objects.petri_net.obj import Marking, PetriNet
 
 from itertools import zip_longest
 
@@ -30,3 +30,6 @@ def update_possible_extensions(pe, new, transitions, co):
         for t in transitions:
             if is_enabled(t, m):
                 pe.add((Event(t), co_set))
+                for c in co_set:
+                    arc = PetriNet.Arc(c, t)
+                    t.in_arcs.add(arc)
