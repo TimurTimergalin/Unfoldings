@@ -7,3 +7,7 @@ class Event(PetriNet.Transition):
         # Название он получит при добавлении в префикс (см. obj/prefix.py)
         super().__init__("", label=transition.name if transition is not None else "")
         self.transition = transition  # Переход в сети, соответствующий данному событию
+
+    def __repr__(self):
+        bot = r'\bot'
+        return f"<{self.name} of {self.transition.name if self.transition else bot}>"

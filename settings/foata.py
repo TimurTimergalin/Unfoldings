@@ -38,6 +38,9 @@ class FoataConfiguration(Configuration):
     def __len__(self):
         return sum(1 for _ in self)
 
+    def __repr__(self):
+        return repr(self.events)
+
 
 def lex_order(events):
     return sorted(events, key=lambda e: id(e.transition))

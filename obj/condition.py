@@ -13,3 +13,6 @@ class Condition(PetriNet.Place):
     def input_event(self):
         e, = petri_utils.pre_set(self)  # По определению развертки, preset условия состоит из одного события
         return e
+
+    def __repr__(self):
+        return f"<{self.name} of {self.place.name}>"

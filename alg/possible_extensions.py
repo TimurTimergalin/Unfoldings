@@ -23,13 +23,13 @@ def is_enabled(t, m):
 # new - добавленное событие
 # transitions - множество всех переходов в изначальной сети
 # co - отношение конкурентности
-# event_factory - метод создания новых событий
 def update_possible_extensions(pe, new, transitions, co):
     for co_set in co.new_co_sets(new):
         m = Marking(x.place for x in co_set)
         for t in transitions:
             if is_enabled(t, m):
-                pe.add((Event(t), co_set))
+                e = Event(t)
                 for c in co_set:
-                    arc = PetriNet.Arc(c, t)
-                    t.in_arcs.add(arc)
+                    arc = PetriNet.Arc(c, e)
+                    e.in_arcs.add(arc)
+                pe.add((e, co_set))

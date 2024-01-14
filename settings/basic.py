@@ -33,6 +33,9 @@ class BasicConfiguration(Configuration):
         l2 = config_length(e2)
         return l1 - l2
 
+    def __repr__(self):
+        return repr(self.events)
+
 
 class BasicSettings(Settings):
     def __init__(self):

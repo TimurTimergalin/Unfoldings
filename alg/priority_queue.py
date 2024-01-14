@@ -75,3 +75,6 @@ class PriorityQueue:
 
     def __len__(self):
         return len(self.heap)
+
+    def __repr__(self):
+        return repr(self.heap)

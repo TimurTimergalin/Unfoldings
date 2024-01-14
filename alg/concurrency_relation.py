@@ -83,3 +83,6 @@ class Co:
                                  current)
         # Ветвь, где el пропущен
         yield from self._co_sets(sorted_co, new, allowed, constructed, current)
+
+    def __repr__(self):
+        return repr(self.pairs)
