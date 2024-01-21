@@ -33,14 +33,12 @@ class PriorityQueue:
             rv = self.heap[ri][0] if self._in_bounds(ri) else None
             cv = self.heap[ind][0]
 
-            if lv is not None and self.cmp(cv, lv) > 0:
-                if rv is None or self.cmp(rv, lv) >= 0:
-                    self.heap[ind], self.heap[li] = self.heap[li], self.heap[ind]
-                    ind = li
-            elif rv is not None and self.cmp(cv, rv) > 0:
-                if lv is None or self.cmp(lv, rv) >= 0:
-                    self.heap[ind], self.heap[ri] = self.heap[ri], self.heap[ind]
-                    ind = ri
+            if lv is not None and self.cmp(cv, lv) > 0 and (rv is None or self.cmp(rv, lv) >= 0):
+                self.heap[ind], self.heap[li] = self.heap[li], self.heap[ind]
+                ind = li
+            elif rv is not None and self.cmp(cv, rv) > 0 and (lv is None or self.cmp(lv, rv) >= 0):
+                self.heap[ind], self.heap[ri] = self.heap[ri], self.heap[ind]
+                ind = ri
             else:
                 break
 

@@ -15,7 +15,10 @@ class Prefix(PetriNet):
         c.name = f"c{self.condition_counter}"
         self.condition_counter += 1
         self.places.add(c)
-        self.condition_labels[c] = {"label": c.place.name}
+        self.condition_labels[c] = {"label": self.condition_label(c)}
+
+    def condition_label(self, c):
+        return c.place.name
 
     def add_event(self, e):
         e.name = f"e{self.event_counter}"

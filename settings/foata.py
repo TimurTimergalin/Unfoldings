@@ -63,7 +63,7 @@ def compare_lex(seq1, seq2):
     return 0
 
 
-def cmp_events(e1, e2, config_length):
+def cmp_events(e1, e2, config_length, f_lex_order, f_compare_lex):
     # Конфигурации не вычисляются, если уже посчитана длина - возможно, сравнения длин будет достаточно
     c1 = None if config_length.calculated(e1) else FoataConfiguration(e1, config_length)
     c2 = None if config_length.calculated(e2) else FoataConfiguration(e2, config_length)
@@ -84,7 +84,7 @@ def cmp_events(e1, e2, config_length):
         c2 = FoataConfiguration(e2, config_length)
 
     # Сравнение в лексикографическом порядке
-    total_cmp = compare_lex(lex_order(c1), lex_order(c2))
+    total_cmp = f_compare_lex(f_lex_order(c1), f_lex_order(c2))
 
     if total_cmp != 0:
         return total_cmp
@@ -96,7 +96,7 @@ def cmp_events(e1, e2, config_length):
         if s is None:  # seq2 - префикс seq1
             return 1
 
-        cmp = compare_lex(f, s)
+        cmp = f_compare_lex(f_lex_order(f), f_lex_order(s))
 
         if cmp != 0:
             return cmp
@@ -108,7 +108,7 @@ class FoataSettings(Settings):
     def __init__(self):
         config_length = ConfigLength(FoataConfiguration)
         self.conf = partial(FoataConfiguration, save_length=config_length)
-        self.cmp = partial(cmp_events, config_length=config_length)
+        self.cmp = partial(cmp_events, config_length=config_length, f_lex_order=lex_order, f_compare_lex=compare_lex)
 
     @property
     def config(self):
@@ -117,5 +117,3 @@ class FoataSettings(Settings):
     @property
     def cmp_events(self):
         return self.cmp
-
-

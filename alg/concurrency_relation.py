@@ -24,7 +24,7 @@ class Co:
             for c1 in petri_utils.pre_set(new_event):
                 if not self(c, c1) or c == c1:
                     break
-            else:  # Если c конкурентно со всеми условиями из preset-а нового события
+            else:  # Если `c` конкурентно со всеми условиями из preset-а нового события
                 concurrent_with.add(c)
 
         self.pairs.update((x, y) for x, y in product(new, new))
@@ -69,20 +69,28 @@ class Co:
         el = sorted_co[current][0]
 
         # Конструирование множества всех таких x, что el co x
-        new_allowed = set()
-        while current < n and (pair := sorted_co[current])[0] == el:
-            new_allowed.add(pair[1])
-            current += 1
+        current, new_allowed = self.create_new_allowed(allowed, current, el, n, sorted_co)
 
         # текущий coset в случае добавления el
         new_constructed = constructed | {el}
         yield new_constructed
         # Ветвь, где el добавлен
-        yield from self._co_sets(sorted_co, new, new_allowed & allowed if allowed is not None else new_allowed,
+        yield from self._co_sets(sorted_co, new, new_allowed,
                                  new_constructed,
                                  current)
         # Ветвь, где el пропущен
         yield from self._co_sets(sorted_co, new, allowed, constructed, current)
+
+    def create_new_allowed(self, allowed, current, el, n, sorted_co):
+        new_allowed = set()
+        while current < n and (pair := sorted_co[current])[0] == el:
+            new_allowed.add(pair[1])
+            current += 1
+
+        if allowed is not None:
+            new_allowed &= allowed
+
+        return current, new_allowed
 
     def __repr__(self):
         return repr(self.pairs)
