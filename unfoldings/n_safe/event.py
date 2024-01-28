@@ -1,6 +1,8 @@
 from obj import Event
 
 
+# Отличие от обычных событий в том, что теперь они помечены не только переходом в изначальной сети,
+# но и разметкой preset-а
 class NSafeEvent(Event):
     def __init__(self, transition, marking):
         super().__init__(transition)

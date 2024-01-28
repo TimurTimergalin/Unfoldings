@@ -5,6 +5,8 @@ from pm4py.objects.petri_net.obj import Marking, PetriNet
 from .event import NSafeEvent
 
 
+# Проверка на то, что событие, помеченное переходом t, может иметь в качестве preset-а
+# co-set с разметкой m
 def is_enabled(t, m):
     pre_set = {x.source: x.weight for x in t.in_arcs}
     post_set = {x.target for x in t.out_arcs}
@@ -22,6 +24,11 @@ def is_enabled(t, m):
     return True
 
 
+# Обновление очереди потенциальных событий после добавления нового события
+# pe - очередь
+# new - добавленное событие
+# transitions - множество всех переходов в изначальной сети
+# co - отношение конкурентности
 def update_possible_extensions(pe, new, transitions, co):
     for co_set in co.new_co_sets(new):
         m = Marking({x.place: x.markers for x in co_set})

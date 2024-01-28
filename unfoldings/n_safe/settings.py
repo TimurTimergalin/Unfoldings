@@ -10,6 +10,7 @@ from settings.config_length_utils import ConfigLength
 from pm4py.objects.petri_net.obj import Marking
 
 
+# Разница от обычной конфигурации лишь в том, как вычисляется разметка конфигурации
 class NSafeFoataConfiguration(FoataConfiguration):
     def mark(self):
         res = Marking()
@@ -24,6 +25,7 @@ class NSafeFoataConfiguration(FoataConfiguration):
         return res
 
 
+# Теперь в лексикографическом порядке учитывается разметка события
 def lex_order(events):
     return sorted(events, key=lambda e: (id(e.transition), hash(e.marking)))
 

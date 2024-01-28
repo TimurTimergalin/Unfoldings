@@ -1,6 +1,8 @@
 from alg import Co
 
 
+# Отличие от базового Co в том, что 2 условия, помеченные одинаковой позицией,
+# в co-set-е присутствовать не должны
 class NSafeCo(Co):
     def create_new_allowed(self, allowed, current, el, n, sorted_co):
         new_allowed = set()

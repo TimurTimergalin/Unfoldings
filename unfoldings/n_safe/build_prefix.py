@@ -8,6 +8,8 @@ from .possible_extensions import update_possible_extensions
 from alg import PriorityQueue
 
 
+# Построение префикса
+# Алгоритм мало отличается от основного, для пояснений см. unfoldings/standard.py
 def build_prefix(net, m0, settings):
     res = NSafePrefix(net.name)
 
@@ -39,6 +41,7 @@ def build_prefix(net, m0, settings):
         for c in pre:
             petri_utils.add_arc_from_to(c, e, res)
             p = c.place
+            # Единственное отличие от основного алгоритма - подсчёт количества маркеров в новых позициях
             dm = c.markers - preset_weight.get(p, 0) + postset_weight.get(p, 0)
             c = NSafeCondition(p, dm)
             res.add_condition(c)

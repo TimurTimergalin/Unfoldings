@@ -1,6 +1,8 @@
 from obj import Condition
 
 
+# Отличие от обычных условий в том, что теперь они помечены не только позицией из начальной сети,
+# но и количеством маркеров в этой позиции
 class NSafeCondition(Condition):
     def __init__(self, place, markers):
         super().__init__(place)
