@@ -1,0 +1,2 @@
+from .mutual_exclusion import generate_mutual_exclusion
+from .dining_philosophers import generate_dining_philosophers

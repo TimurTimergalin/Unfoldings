@@ -3,6 +3,8 @@ from pm4py.objects.petri_net.utils import petri_utils
 from alg import Co, PriorityQueue, update_possible_extensions
 from obj import Prefix, Event, Condition
 
+from itertools import chain
+
 
 # Строит развертку сети Петри по алгоритму МакМиллана (но с настраиваемым порядком на конфигурациях)
 # net - сеть Петри
@@ -42,7 +44,9 @@ def build_prefix(net, m0, settings):
             petri_utils.add_arc_from_to(c, e, res)
 
         # Создаём условия, соответствующие позициям из post_set-а перехода, представленного выбранным событием
+        postset = set()
         for a in e.transition.out_arcs:
+            postset.add(a.target)
             for _ in range(a.weight):
                 c = Condition(a.target)
                 res.add_condition(c)
@@ -52,7 +56,8 @@ def build_prefix(net, m0, settings):
         config = settings.config(e)
         m = config.mark()
         if m not in min_by_mark or settings.cmp_events(min_by_mark[m], e) >= 0:
-            update_possible_extensions(pe, e, net.transitions, co)
+            transitions = set(chain.from_iterable(petri_utils.post_set(x) for x in postset))
+            update_possible_extensions(pe, e, transitions, co)
             min_by_mark[m] = e
 
     # После процедуры удаляем событие bot из префикса - оно было нужно лишь при построении
