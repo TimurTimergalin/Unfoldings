@@ -10,25 +10,24 @@ from alg import PriorityQueue
 
 # Построение префикса
 # Алгоритм мало отличается от основного, для пояснений см. unfoldings/standard.py
-def build_prefix(net, m0, settings):
+def build_prefix(net, m0, order_settings, cutoff_settings):
     res = NSafePrefix(net.name)
-
-    min_by_mark = {}
 
     e = NSafeEvent(None, None)
     bot = e
     res.add_event(e)
 
     co = NSafeCo()
-    pe = PriorityQueue(settings.cmp_events)
+    pe = PriorityQueue(order_settings.cmp_events)
 
     for p in net.places:
         c = NSafeCondition(p, m0.get(p, 0))
         res.add_condition(c)
         petri_utils.add_arc_from_to(e, c, res)
+        res.add_starting_condition(c)
 
     co.update(e, res.places)
-    min_by_mark[m0] = e
+    cutoff_settings.update(e, order_settings, mark=m0)
     update_possible_extensions(pe, e, net.transitions, co)
 
     while pe:
@@ -46,14 +45,13 @@ def build_prefix(net, m0, settings):
             c = NSafeCondition(p, dm)
             res.add_condition(c)
             petri_utils.add_arc_from_to(e, c, res)
-            res.add_starting_condition(c)
 
         co.update(e, res.places)
-        config = settings.config(e)
-        m = config.mark()
-        if m not in min_by_mark or settings.cmp_events(min_by_mark[m], e) >= 0:
+
+        is_cutoff, hint = cutoff_settings.check_cutoff(e, order_settings)
+        if not is_cutoff:
+            cutoff_settings.update(e, order_settings, **hint)
             update_possible_extensions(pe, e, net.transitions, co)
-            min_by_mark[m] = e
         else:
             res.add_cutoff(e)
 

@@ -1,6 +1,6 @@
 from pm4py.objects.petri_net.utils import petri_utils
 
-from .abstract import Configuration, Settings
+from .abstract import Configuration, OrderSettings
 from .config_length_utils import ConfigLength
 
 from functools import partial
@@ -37,7 +37,7 @@ class BasicConfiguration(Configuration):
         return repr(self.events)
 
 
-class BasicSettings(Settings):
+class BasicOrderSettings(OrderSettings):
     def __init__(self):
         config_length = ConfigLength(BasicConfiguration)
         self.conf = partial(BasicConfiguration, save_length=config_length)

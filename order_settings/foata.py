@@ -1,6 +1,6 @@
 from pm4py.objects.petri_net.utils import petri_utils
 
-from .abstract import Configuration, Settings
+from .abstract import Configuration, OrderSettings
 from .config_length_utils import ConfigLength
 
 from itertools import chain, zip_longest
@@ -112,7 +112,7 @@ def cmp_events(e1, e2, config_length, f_lex_order, f_compare_lex):
     return 0
 
 
-class FoataSettings(Settings):
+class FoataOrderSettings(OrderSettings):
     def __init__(self):
         config_length = ConfigLength(FoataConfiguration)
         self.conf = partial(FoataConfiguration, save_length=config_length)

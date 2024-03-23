@@ -3,13 +3,13 @@ from pm4py.objects.petri_net.utils import petri_utils
 from alg import Co, PriorityQueue, update_possible_extensions
 from obj import Prefix, Event, Condition
 
-from settings import BasicSettings
+from order_settings import BasicOrderSettings
 
 from itertools import chain
 
 
 def build_unfolding(net, m0, event_count=20):
-    settings = BasicSettings()
+    settings = BasicOrderSettings()
     res = Prefix(net.name)
     e = Event(None)  # "Изначальное" событие \bot. Его post_set-ом будут условия, соответствующе начальной маркировке
     bot = e

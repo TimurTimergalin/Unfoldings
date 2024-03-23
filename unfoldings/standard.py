@@ -10,20 +10,19 @@ from itertools import chain
 # net - сеть Петри
 # m0 - начальная разметка
 # config_type - тип конфигурации
-def build_prefix(net, m0, settings):
+def build_prefix(net, m0, order_settings, cutoff_settings):
     res = Prefix(net.name)  # В res будет находиться итоговый префикс
 
     # В этом словаре разметкам будут сопоставляться события, локальные конфигурации которых минимальны
     # и имеют эту разметку.
     # Он будет использоваться для того, чтобы узнать, является ли то или иное событие cut-off
-    min_by_mark = {}
 
     e = Event(None)  # "Изначальное" событие \bot. Его post_set-ом будут условия, соответствующе начальной маркировке
     bot = e
     res.add_event(e)
 
     co = Co()
-    pe = PriorityQueue(settings.cmp_events)
+    pe = PriorityQueue(order_settings.cmp_events)
 
     for p in m0.elements():  # Добавление условий, соответствующих начальной разметке
         c = Condition(p)
@@ -33,7 +32,7 @@ def build_prefix(net, m0, settings):
 
     # Обновление отношения co, очереди pe и словаря конфигураций
     co.update(e, res.places)
-    min_by_mark[m0] = e
+    cutoff_settings.update(e, order_settings, mark=m0)
     update_possible_extensions(pe, e, net.transitions, co)
 
     while pe:  # Пока к префиксу можно добавить новые события
@@ -54,12 +53,11 @@ def build_prefix(net, m0, settings):
                 petri_utils.add_arc_from_to(e, c, res)
 
         co.update(e, res.places)
-        config = settings.config(e)
-        m = config.mark()
-        if m not in min_by_mark or settings.cmp_events(min_by_mark[m], e) >= 0:
+        is_cutoff, hint = cutoff_settings.check_cutoff(e, order_settings)
+        if not is_cutoff:
+            cutoff_settings.update(e, order_settings, **hint)
             transitions = set(chain.from_iterable(petri_utils.post_set(x) for x in postset))
             update_possible_extensions(pe, e, transitions, co)
-            min_by_mark[m] = e
         else:
             res.add_cutoff(e)
 

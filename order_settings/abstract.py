@@ -4,7 +4,7 @@ from pm4py.objects.petri_net.obj import Marking
 from pm4py.objects.petri_net.utils import petri_utils
 
 
-class Settings(ABC):
+class OrderSettings(ABC):
     @property
     @abstractmethod
     def config(self):
