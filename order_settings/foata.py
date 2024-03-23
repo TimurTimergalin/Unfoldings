@@ -71,10 +71,10 @@ def compare_lex(seq1, seq2):
     return 0
 
 
-def cmp_events(e1, e2, config_length, f_lex_order, f_compare_lex):
+def cmp_events(e1, e2, config_length, f_lex_order, f_compare_lex, *, config1=None, config2=None, **kwargs):
     # Конфигурации не вычисляются, если уже посчитана длина - возможно, сравнения длин будет достаточно
-    c1 = None if config_length.calculated(e1) else FoataConfiguration(e1, config_length)
-    c2 = None if config_length.calculated(e2) else FoataConfiguration(e2, config_length)
+    c1 = config1 if config_length.calculated(e1) else FoataConfiguration(e1, config_length)
+    c2 = config2 if config_length.calculated(e2) else FoataConfiguration(e2, config_length)
 
     # Сравнение длин
     l1 = config_length(e1)

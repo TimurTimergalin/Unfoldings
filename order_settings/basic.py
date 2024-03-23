@@ -28,7 +28,7 @@ class BasicConfiguration(Configuration):
         return len(self.events)
 
     @staticmethod
-    def cmp_events(e1, e2, config_length):
+    def cmp_events(e1, e2, config_length, **kwargs):
         l1 = config_length(e1)
         l2 = config_length(e2)
         return l1 - l2
