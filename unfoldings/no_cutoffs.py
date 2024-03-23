@@ -22,6 +22,7 @@ def build_unfolding(net, m0, event_count=20):
         c = Condition(p)
         res.add_condition(c)
         petri_utils.add_arc_from_to(e, c, res)
+        res.add_starting_condition(c)
 
     co.update(e, res.places)
     update_possible_extensions(pe, e, net.transitions, co)

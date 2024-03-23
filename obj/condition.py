@@ -16,3 +16,7 @@ class Condition(PetriNet.Place):
 
     def __repr__(self):
         return f"<{self.name} of {self.place.name}>"
+
+    @property
+    def net_label(self):
+        return id(self.place)

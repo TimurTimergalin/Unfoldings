@@ -29,6 +29,7 @@ def build_prefix(net, m0, settings):
         c = Condition(p)
         res.add_condition(c)
         petri_utils.add_arc_from_to(e, c, res)
+        res.add_starting_condition(c)
 
     # Обновление отношения co, очереди pe и словаря конфигураций
     co.update(e, res.places)
@@ -59,6 +60,8 @@ def build_prefix(net, m0, settings):
             transitions = set(chain.from_iterable(petri_utils.post_set(x) for x in postset))
             update_possible_extensions(pe, e, transitions, co)
             min_by_mark[m] = e
+        else:
+            res.add_cutoff(e)
 
     # После процедуры удаляем событие bot из префикса - оно было нужно лишь при построении
     for a in bot.out_arcs:

@@ -30,8 +30,8 @@ class Configuration(ABC):
     def mark(self):
         res = Marking()
         for e in self:
-            post_set_marking = Marking(c.place for c in petri_utils.post_set(e))
-            pre_set_marking = Marking(c.place for c in petri_utils.pre_set(e))
+            post_set_marking = e.postset_marking()
+            pre_set_marking = e.preset_marking()
 
             res.update(post_set_marking)
             res.subtract(pre_set_marking)

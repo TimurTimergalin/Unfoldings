@@ -42,8 +42,16 @@ class FoataConfiguration(Configuration):
         return repr(self.events)
 
 
+def _cmp_from_operators(o1, o2):
+    if o1 < o2:
+        return -1
+    if o1 > o2:
+        return 1
+    return 0
+
+
 def lex_order(events):
-    return sorted(events, key=lambda e: id(e.transition))
+    return sorted(events, key=lambda e: e.net_label)
 
 
 def compare_lex(seq1, seq2):
@@ -53,10 +61,10 @@ def compare_lex(seq1, seq2):
         if s is None:  # seq2 - префикс seq1
             return 1
 
-        fi = id(f.transition)
-        si = id(s.transition)
+        # fi = id(f.transition)
+        # si = id(s.transition)
 
-        cmp = fi - si
+        cmp = _cmp_from_operators(f.net_label, s.net_label)
         if cmp != 0:
             return cmp
 

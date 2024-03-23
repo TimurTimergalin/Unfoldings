@@ -46,6 +46,7 @@ def build_prefix(net, m0, settings):
             c = NSafeCondition(p, dm)
             res.add_condition(c)
             petri_utils.add_arc_from_to(e, c, res)
+            res.add_starting_condition(c)
 
         co.update(e, res.places)
         config = settings.config(e)
@@ -53,6 +54,8 @@ def build_prefix(net, m0, settings):
         if m not in min_by_mark or settings.cmp_events(min_by_mark[m], e) >= 0:
             update_possible_extensions(pe, e, net.transitions, co)
             min_by_mark[m] = e
+        else:
+            res.add_cutoff(e)
 
     for a in bot.out_arcs:
         a.target.in_arcs.remove(a)

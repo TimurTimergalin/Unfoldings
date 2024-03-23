@@ -10,3 +10,9 @@ class NSafeCondition(Condition):
 
     def __repr__(self):
         return f"<{self.name} of {self.place.name} with {self.markers} markers>"
+
+    @property
+    def net_label(self):
+        return super().net_label, self.markers
+
+
