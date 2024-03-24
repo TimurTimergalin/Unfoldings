@@ -10,7 +10,10 @@ from itertools import chain
 # net - сеть Петри
 # m0 - начальная разметка
 # config_type - тип конфигурации
-def build_prefix(net, m0, order_settings, cutoff_settings):
+def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
+    if event_count is not None and event_count <= 0:
+        raise ValueError("event count must be positive")
+
     res = Prefix(net.name)  # В res будет находиться итоговый префикс
 
     # В этом словаре разметкам будут сопоставляться события, локальные конфигурации которых минимальны
@@ -35,6 +38,8 @@ def build_prefix(net, m0, order_settings, cutoff_settings):
     cutoff_settings.update(e, order_settings, mark=m0)
     update_possible_extensions(pe, e, net.transitions, co)
 
+    count = 0
+    finished = True
     while pe:  # Пока к префиксу можно добавить новые события
         e, pre = pe.pop()  # Выбираем событие с минимальной длиной локальной конфигурации
 
@@ -58,6 +63,10 @@ def build_prefix(net, m0, order_settings, cutoff_settings):
             cutoff_settings.update(e, order_settings, **hint)
             transitions = set(chain.from_iterable(petri_utils.post_set(x) for x in postset))
             update_possible_extensions(pe, e, transitions, co)
+            count += 1
+            if event_count is not None and pe and count >= event_count:
+                finished = False
+                break
         else:
             res.add_cutoff(e)
 
@@ -67,5 +76,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings):
         res.arcs.remove(a)
 
     res.transitions.remove(bot)
+
+    res.finished = finished
 
     return res

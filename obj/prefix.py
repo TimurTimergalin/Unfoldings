@@ -12,6 +12,7 @@ class Prefix(PetriNet):
         self.event_counter = 0
         self.condition_counter = 1
         self.cutoff_events = set()
+        self.finished = False
 
     def add_condition(self, c):
         c.name = f"c{self.condition_counter}"

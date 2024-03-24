@@ -1,2 +1,3 @@
 from .abstract import CutoffSettings
-from .mark_cutoff_settings import MarkCutoffSettings
+from .mark import MarkCutoffSettings
+from .idle import IdleCutoffSettings

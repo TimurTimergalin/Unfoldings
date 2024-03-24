@@ -10,7 +10,9 @@ from alg import PriorityQueue
 
 # Построение префикса
 # Алгоритм мало отличается от основного, для пояснений см. unfoldings/standard.py
-def build_prefix(net, m0, order_settings, cutoff_settings):
+def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
+    if event_count is not None and event_count <= 0:
+        raise ValueError("event count must be positive")
     res = NSafePrefix(net.name)
 
     e = NSafeEvent(None, None)
@@ -30,6 +32,8 @@ def build_prefix(net, m0, order_settings, cutoff_settings):
     cutoff_settings.update(e, order_settings, mark=m0)
     update_possible_extensions(pe, e, net.transitions, co)
 
+    count = 0
+    finished = True
     while pe:
         e, pre = pe.pop()
         res.add_event(e)
@@ -52,6 +56,10 @@ def build_prefix(net, m0, order_settings, cutoff_settings):
         if not is_cutoff:
             cutoff_settings.update(e, order_settings, **hint)
             update_possible_extensions(pe, e, net.transitions, co)
+            count += 1
+            if event_count is not None and pe and count >= event_count:
+                finished = False
+                break
         else:
             res.add_cutoff(e)
 
@@ -60,5 +68,6 @@ def build_prefix(net, m0, order_settings, cutoff_settings):
         res.arcs.remove(a)
 
     res.transitions.remove(bot)
+    res.finished = finished
 
     return res
