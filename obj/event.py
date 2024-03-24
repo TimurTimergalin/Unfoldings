@@ -6,7 +6,7 @@ from pm4py.objects.petri_net.utils import petri_utils
 class Event(PetriNet.Transition):
     def __init__(self, transition):  # None, если event = \bot
         # Название он получит при добавлении в префикс (см. obj/prefix.py)
-        super().__init__("", label=transition.name if transition is not None else "")
+        super().__init__("", "")
         self.transition = transition  # Переход в сети, соответствующий данному событию
 
     def __repr__(self):

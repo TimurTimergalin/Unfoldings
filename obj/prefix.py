@@ -18,10 +18,6 @@ class Prefix(PetriNet):
         c.name = f"c{self.condition_counter}"
         self.condition_counter += 1
         self.places.add(c)
-        self.decorations[c]["label"] = self.condition_label(c)
-
-    def condition_label(self, c):
-        return c.place.name
 
     def add_event(self, e):
         e.name = f"e{self.event_counter}"
@@ -30,10 +26,3 @@ class Prefix(PetriNet):
 
     def add_cutoff(self, ev):
         self.cutoff_events.add(ev)
-        self.decorations[ev]["color"] = "#ffaaaa"
-
-    def add_starting_condition(self, c):
-        self.decorations[c]["color"] = "#aaffaa"
-
-    def view(self):
-        pm4py.view_petri_net(self, None, None, decorations=self.decorations)

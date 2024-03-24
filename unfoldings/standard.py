@@ -1,6 +1,7 @@
 from pm4py.objects.petri_net.utils import petri_utils
 
 from alg import Co, PriorityQueue, update_possible_extensions
+from decorations import IdleDecorations
 from obj import Prefix, Event, Condition
 
 from itertools import chain
@@ -10,9 +11,11 @@ from itertools import chain
 # net - сеть Петри
 # m0 - начальная разметка
 # config_type - тип конфигурации
-def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
+def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, event_count=None):
     if event_count is not None and event_count <= 0:
         raise ValueError("event count must be positive")
+    if decorations is None:
+        decorations = IdleDecorations()
 
     res = Prefix(net.name)  # В res будет находиться итоговый префикс
 
@@ -31,7 +34,8 @@ def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
         c = Condition(p)
         res.add_condition(c)
         petri_utils.add_arc_from_to(e, c, res)
-        res.add_starting_condition(c)
+        decorations.add_condition(c)
+        decorations.add_starting_condition(c)
 
     # Обновление отношения co, очереди pe и словаря конфигураций
     co.update(e, res.places)
@@ -56,9 +60,11 @@ def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
                 c = Condition(a.target)
                 res.add_condition(c)
                 petri_utils.add_arc_from_to(e, c, res)
+                decorations.add_condition(c)
 
         co.update(e, res.places)
         is_cutoff, hint = cutoff_settings.check_cutoff(e, order_settings)
+        decorations.add_event(e)
         if not is_cutoff:
             cutoff_settings.update(e, order_settings, **hint)
             transitions = set(chain.from_iterable(petri_utils.post_set(x) for x in postset))
@@ -69,6 +75,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
                 break
         else:
             res.add_cutoff(e)
+            decorations.add_cutoff_event(e)
 
     # После процедуры удаляем событие bot из префикса - оно было нужно лишь при построении
     for a in bot.out_arcs:

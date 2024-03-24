@@ -1,6 +1,7 @@
 from pm4py.objects.petri_net.utils import petri_utils
 
-from .prefix import NSafePrefix
+from decorations import IdleDecorations
+from obj import Prefix
 from .event import NSafeEvent
 from .condition import NSafeCondition
 from .concurrency_relation import NSafeCo
@@ -10,10 +11,12 @@ from alg import PriorityQueue
 
 # Построение префикса
 # Алгоритм мало отличается от основного, для пояснений см. unfoldings/standard.py
-def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
+def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, event_count=None):
     if event_count is not None and event_count <= 0:
         raise ValueError("event count must be positive")
-    res = NSafePrefix(net.name)
+    if decorations is None:
+        decorations = IdleDecorations()
+    res = Prefix(net.name)
 
     e = NSafeEvent(None, None)
     bot = e
@@ -26,7 +29,8 @@ def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
         c = NSafeCondition(p, m0.get(p, 0))
         res.add_condition(c)
         petri_utils.add_arc_from_to(e, c, res)
-        res.add_starting_condition(c)
+        decorations.add_condition(c)
+        decorations.add_starting_condition(c)
 
     co.update(e, res.places)
     cutoff_settings.update(e, order_settings, mark=m0)
@@ -49,10 +53,12 @@ def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
             c = NSafeCondition(p, dm)
             res.add_condition(c)
             petri_utils.add_arc_from_to(e, c, res)
+            decorations.add_condition(c)
 
         co.update(e, res.places)
 
         is_cutoff, hint = cutoff_settings.check_cutoff(e, order_settings)
+        decorations.add_event(e)
         if not is_cutoff:
             cutoff_settings.update(e, order_settings, **hint)
             update_possible_extensions(pe, e, net.transitions, co)
@@ -62,6 +68,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, event_count=None):
                 break
         else:
             res.add_cutoff(e)
+            decorations.add_cutoff_event(e)
 
     for a in bot.out_arcs:
         a.target.in_arcs.remove(a)
