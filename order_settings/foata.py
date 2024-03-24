@@ -71,7 +71,7 @@ def compare_lex(seq1, seq2):
     return 0
 
 
-def cmp_events(e1, e2, config_length, f_lex_order, f_compare_lex, *, config1=None, config2=None, **kwargs):
+def cmp_events(e1, e2, config_length, *, config1=None, config2=None, foata, **kwargs):
     # Конфигурации не вычисляются, если уже посчитана длина - возможно, сравнения длин будет достаточно
     c1 = config1 if config_length.calculated(e1) else FoataConfiguration(e1, config_length)
     c2 = config2 if config_length.calculated(e2) else FoataConfiguration(e2, config_length)
@@ -92,9 +92,9 @@ def cmp_events(e1, e2, config_length, f_lex_order, f_compare_lex, *, config1=Non
         c2 = FoataConfiguration(e2, config_length)
 
     # Сравнение в лексикографическом порядке
-    total_cmp = f_compare_lex(f_lex_order(c1), f_lex_order(c2))
+    total_cmp = compare_lex(lex_order(c1), lex_order(c2))
 
-    if total_cmp != 0:
+    if total_cmp != 0 or not foata:
         return total_cmp
 
     # Сравнение нормальных форм
@@ -104,7 +104,7 @@ def cmp_events(e1, e2, config_length, f_lex_order, f_compare_lex, *, config1=Non
         if s is None:  # seq2 - префикс seq1
             return 1
 
-        cmp = f_compare_lex(f_lex_order(f), f_lex_order(s))
+        cmp = compare_lex(lex_order(f), lex_order(s))
 
         if cmp != 0:
             return cmp
@@ -116,7 +116,22 @@ class FoataOrderSettings(OrderSettings):
     def __init__(self):
         config_length = ConfigLength(FoataConfiguration)
         self.conf = partial(FoataConfiguration, save_length=config_length)
-        self.cmp = partial(cmp_events, config_length=config_length, f_lex_order=lex_order, f_compare_lex=compare_lex)
+        self.cmp = partial(cmp_events, config_length=config_length, foata=True)
+
+    @property
+    def config(self):
+        return self.conf
+
+    @property
+    def cmp_events(self):
+        return self.cmp
+
+
+class TotalOrderSettings(OrderSettings):
+    def __init__(self):
+        config_length = ConfigLength(FoataConfiguration)
+        self.conf = partial(FoataConfiguration, save_length=config_length)
+        self.cmp = partial(cmp_events, config_length=config_length, foata=False)
 
     @property
     def config(self):
