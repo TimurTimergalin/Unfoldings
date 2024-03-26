@@ -6,46 +6,18 @@ from pm4py.objects.petri_net.utils import petri_utils
 from .event import NSafeEvent
 
 
-# Проверка на то, что событие, помеченное переходом t, может иметь в качестве preset-а
-# co-set с разметкой m
-def is_enabled(t, m):
-    pre_set = {x.source: x.weight for x in t.in_arcs}
-    post_set = {x.target for x in t.out_arcs}
-    for p, k in zip_longest(set(pre_set) | post_set, m):
-        # Такое возможно, только если количество ключей не совпадает
-        if p is None or k is None:
-            return False
-
-        if k not in pre_set and k not in post_set:
-            return False
-
-        if p in pre_set and m[p] < pre_set[p]:
-            return False
-
-    return True
-
-
-# Обновление очереди потенциальных событий после добавления нового события
-# pe - очередь
-# new - добавленное событие
-# transitions - множество всех переходов в изначальной сети
-# co - отношение конкурентности
-def update_possible_extensions(pe, new, c, co, transitions=None):
-    # for co_set in co.new_co_sets(new):
-    #     m = Marking({x.place: x.markers for x in co_set})
-    #     for t in transitions:
-    #         if is_enabled(t, m):
-    #             e = NSafeEvent(t, m)
-    #
-    #             for c in co_set:
-    #                 arc = PetriNet.Arc(c, e)
-    #                 e.in_arcs.add(arc)
-    #             pe.add((e, co_set))
-    t = new.transition
-    transitions = transitions or set(
+def update_possible_extensions(pe, new, c, co):
+    """
+    Обновление очереди возможных расширений после добавления нового события
+    :param pe: очередь возможных расширений
+    :param new: добавленное событие
+    :param c: множество условий, конкурентных с new (считается в Co.update)
+    :param co: отношение конкурентности
+    """
+    transitions = set(
         chain.from_iterable(
             petri_utils.post_set(x) | petri_utils.pre_set(x)
-            for x in petri_utils.post_set(t) | petri_utils.pre_set(t)
+            for x in (y.place for y in petri_utils.post_set(new))
         )
     )
 

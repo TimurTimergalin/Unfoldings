@@ -3,6 +3,7 @@ from collections import defaultdict
 
 
 class IdleDecorations(Decorations):
+    """Пустые декорации"""
     def __init__(self):
         self.decorations = defaultdict(lambda: {})
 

@@ -3,6 +3,11 @@ from pm4py.objects.petri_net.utils.petri_utils import add_arc_from_to as arc
 
 
 def generate_dining_philosophers(n):
+    """
+    Генерирует сеть Петри, моделирующую задачу об обедающих философах
+    :param n: количество философов
+    :return: сеть Петри и её начальную разметку
+    """
     net = PetriNet(f"Dining philosophers {n}")
     marking = Marking()
 

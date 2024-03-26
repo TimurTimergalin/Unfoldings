@@ -7,6 +7,7 @@ from functools import partial
 
 
 class BasicConfiguration(Configuration):
+    """Представление конфигурации в виде множества событий"""
     def __init__(self, event, save_length=None):
         self.events = set()
         self.init_events(event)
@@ -28,7 +29,12 @@ class BasicConfiguration(Configuration):
         return len(self.events)
 
     @staticmethod
-    def cmp_events(e1, e2, config_length, **kwargs):
+    def cmp_events(e1, e2, config_length, *, config1=None, config2=None, **kwargs):
+        if config1 is not None and not config_length.calculated(e1):
+            config_length.save(e1, len(config1))
+        if config2 is not None and not config_length.calculated(e2):
+            config_length.save(e2, len(config2))
+
         l1 = config_length(e1)
         l2 = config_length(e2)
         return l1 - l2
@@ -38,15 +44,20 @@ class BasicConfiguration(Configuration):
 
 
 class BasicOrderSettings(OrderSettings):
+    """Настройки порядка, при которых конфигурации сравниваются по длине"""
     def __init__(self):
         config_length = ConfigLength(BasicConfiguration)
         self.conf = partial(BasicConfiguration, save_length=config_length)
         self.cmp = partial(BasicConfiguration.cmp_events, config_length=config_length)
 
-    @property
-    def config(self):
-        return self.conf
+    def config(self, event):
+        return self.conf(event)
 
-    @property
-    def cmp_events(self):
-        return self.cmp
+    def cmp_events(self, e1, e2, **kwargs):
+        """
+        Принимаемые подсказки:
+            config1 - конфигурация e1. Если длина конфигурации e1 не была посчитана жо этого, вместо вычисления
+            конфигурации будет использована длина config1
+            config2 - конфигурация e2. Используется аналогично config1
+        """
+        return self.cmp(e1, e2, **kwargs)

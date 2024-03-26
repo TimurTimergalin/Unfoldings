@@ -8,9 +8,9 @@ from functools import partial
 
 
 class FoataConfiguration(Configuration):
+    """Представление конфигурации в виде "слоев", соответствующих Фоатовской нормальной форме"""
+
     def __init__(self, event, save_length=None):
-        # Все события будут разбиты на несколько частей таким образом, чтобы в events[0] всегда лежали все
-        # минимальные события
         self.events = []
         met = set()
         self.init_events(event, met)
@@ -72,6 +72,11 @@ def compare_lex(seq1, seq2):
 
 
 def cmp_events(e1, e2, config_length, *, config1=None, config2=None, foata, **kwargs):
+    if config1 is not None and not config_length.calculated(e1):
+        config_length.save(e1, len(config1))
+    if config2 is not None and not config_length.calculated(e2):
+        config_length.save(e2, len(config2))
+
     # Конфигурации не вычисляются, если уже посчитана длина - возможно, сравнения длин будет достаточно
     c1 = config1 if config_length.calculated(e1) else FoataConfiguration(e1, config_length)
     c2 = config2 if config_length.calculated(e2) else FoataConfiguration(e2, config_length)
@@ -113,18 +118,25 @@ def cmp_events(e1, e2, config_length, *, config1=None, config2=None, foata, **kw
 
 
 class FoataOrderSettings(OrderSettings):
+    """Настройки порядка, при которых конфигурации сравниваются по Фоатовской нормальной форме"""
+
     def __init__(self):
         config_length = ConfigLength(FoataConfiguration)
         self.conf = partial(FoataConfiguration, save_length=config_length)
         self.cmp = partial(cmp_events, config_length=config_length, foata=True)
 
-    @property
-    def config(self):
-        return self.conf
+    def config(self, event):
+        return self.conf(event)
 
-    @property
-    def cmp_events(self):
-        return self.cmp
+    def cmp_events(self, e1, e2, **kwargs):
+        """
+        Принимаемые подсказки:
+            config1 - конфигурация e1. Если длина конфигурации e1 не была посчитана жо этого, вместо вычисления
+            конфигурации будет использована длина config1. Если длины e1 и e2 равны, вместо вычисления конфигурации
+            будет использована config1.
+            config2 - конфигурация e2. Используется аналогично config1
+        """
+        return self.cmp(e1, e2, **kwargs)
 
 
 class TotalOrderSettings(OrderSettings):
@@ -133,10 +145,8 @@ class TotalOrderSettings(OrderSettings):
         self.conf = partial(FoataConfiguration, save_length=config_length)
         self.cmp = partial(cmp_events, config_length=config_length, foata=False)
 
-    @property
-    def config(self):
-        return self.conf
+    def config(self, event):
+        return self.conf(event)
 
-    @property
-    def cmp_events(self):
-        return self.cmp
+    def cmp_events(self, e1, e2, **kwargs):
+        return self.cmp(e1, e2, **kwargs)

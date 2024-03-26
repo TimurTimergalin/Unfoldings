@@ -2,6 +2,7 @@ from .abstract import CutoffSettings
 
 
 class MarkCutoffSettings(CutoffSettings):
+    """Класс настроек, при которых для нахождения отсечек сравнивается разметка локальных конфигураций"""
     def __init__(self):
         self.min_by_mark = {}
 

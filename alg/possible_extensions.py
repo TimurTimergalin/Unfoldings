@@ -7,17 +7,18 @@ from collections import defaultdict
 from obj import Event
 
 
-# Обновление очереди потенциальных событий после добавления нового события
-# pe - очередь
-# new - добавленное событие
-# transitions - множество всех переходов в изначальной сети
-# co - отношение конкурентности
-def update_possible_extensions(pe, new, c, co, transitions=None):
-    t = new.transition
-    transitions = transitions or set(
+def update_possible_extensions(pe, new, c, co):
+    """
+    Обновление очереди возможных расширений после добавления нового события
+    :param pe: очередь возможных расширений
+    :param new: добавленное событие
+    :param c: множество условий, конкурентных с new (считается в Co.update)
+    :param co: отношение конкурентности
+    """
+    transitions = set(
         chain.from_iterable(
             petri_utils.post_set(x)
-            for x in petri_utils.post_set(t)
+            for x in set(y.place for y in petri_utils.post_set(new))
         )
     )
 

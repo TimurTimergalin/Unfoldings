@@ -2,8 +2,11 @@ from pm4py.objects.petri_net.obj import PetriNet, Marking
 from pm4py.objects.petri_net.utils import petri_utils
 
 
-# Класс, представляющий событие в префиксе
 class Event(PetriNet.Transition):
+    """
+    Класс, представляющий событие развертки
+    :attribute transition: переход изначальной сети, которым помечено событие
+    """
     def __init__(self, transition):  # None, если event = \bot
         # Название он получит при добавлении в префикс (см. obj/prefix.py)
         super().__init__("", "")

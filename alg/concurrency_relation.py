@@ -3,18 +3,23 @@ from pm4py.objects.petri_net.utils import petri_utils
 from itertools import product
 
 
-# Класс, представляющий отношение co(x, y) := not (x <= y) and not "x в конфликте с y"
 class Co:
+    """
+    Класс, представляющий отношение co(x, y) := [not (x <= y) and not (x # y)] на условиях сети
+    """
     def __init__(self):
         self.pairs = set()  # Отношение представляется в виде множества пар
 
     def __call__(self, f, s):
+        """Определяет, конкурентны ли условия"""
         return (f, s) in self.pairs or (s, f) in self.pairs
 
-    # Обновляет отношение после добавления нового события
-    # new_event - новое событие
-    # conditions - множество всех условий в префиксе (в том числе новых)
     def update(self, new_event, conditions):
+        """
+        Обновляет отношение после добавления нового события
+        :param new_event: новое событие
+        :param conditions: множество всех условий в префиксе (в том числе новых)
+        """
         new = petri_utils.post_set(new_event)  # post_set нового события
         old = conditions - new  # Все остальные условия
 
@@ -30,7 +35,6 @@ class Co:
 
         self.pairs.update((x, y) for x, y in product(new, new) if x != y)
         self.pairs.update((x, y) for x, y in product(new, concurrent_with))
-        # self.pairs.update((x, y) for x, y in product(concurrent_with, new))
 
         return concurrent_with
 

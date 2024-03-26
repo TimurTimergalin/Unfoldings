@@ -3,7 +3,15 @@ from .idle import IdleDecorations
 
 
 class ColorsDecorations(Decorations):
+    """Декорации, позволяющие менять цвет элементов сети"""
     def __init__(self, inner=None, /, *, conditions=None, events=None, starting_conditions=None, cutoff_events=None):
+        """
+        :param inner: внутренняя декорация, по умолчанию idle
+        :param conditions: цвет условий, по умолчанию на выбор pm4py
+        :param events: цвет событий, по умолчанию на выбор pm4py
+        :param starting_conditions: цвет начальных событий, по умолчанию совпадает с conditions
+        :param cutoff_events: цвет отсеченных событий, по умолчанию совпадает с events
+        """
         self.events = events
         self.starting_conditions = starting_conditions
         self.cutoff_events = cutoff_events

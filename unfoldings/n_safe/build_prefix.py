@@ -8,9 +8,20 @@ from .possible_extensions import update_possible_extensions
 from alg import PriorityQueue, Co
 
 
-# Построение префикса
-# Алгоритм мало отличается от основного, для пояснений см. unfoldings/standard.py
 def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, event_count=None):
+    """
+    Строит канонический префикс развертки данной сети (при правильно определенном контексте срезания, за который
+    отвечают аргументы order_settings и cutoff_settings)
+    :param net: сеть Петри
+    :param m0: начальная разметка net
+    :param order_settings: настройки порядка
+    :param cutoff_settings: настройки срезания
+    :param decorations: декорации (опционально)
+    :param event_count: максимальное количество событий в префиксе. Если построение префикса не закончится до того,
+    как количество событий в префиксе превысит данное значение, построение префикса прекратится и значение флага
+    finished будет False. Если не передать event_count, ограничения на количество событий не будет
+    :return: префикс развертки
+    """
     if event_count is not None and event_count <= 0:
         raise ValueError("event count must be positive")
     if decorations is None:
@@ -24,6 +35,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
     co = Co()
     pe = PriorityQueue(order_settings.cmp_events)
 
+    # Начальные условия берутся из всех позиций изначальной сети
     for p in net.places:
         c = NSafeCondition(p, m0.get(p, 0))
         res.add_condition(c)
@@ -33,7 +45,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
 
     co.update(e, res.places)
     cutoff_settings.update(e, order_settings, mark=m0)
-    update_possible_extensions(pe, e, res.places, co, net.transitions)
+    update_possible_extensions(pe, e, res.places, co)
 
     count = 0
     finished = True

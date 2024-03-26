@@ -1,4 +1,5 @@
 class ConfigLength:
+    """Класс для кэширования длин локальных конфигураций событий"""
     def __init__(self, config_type):
         self.cache = {}
         self.conf = config_type
@@ -10,4 +11,6 @@ class ConfigLength:
         self.cache[ev] = length
 
     def __call__(self, ev):
-        return self.cache.get(ev, len(self.conf(ev)))
+        res = self.cache.get(ev, len(self.conf(ev)))
+        self.save(ev, res)
+        return res
