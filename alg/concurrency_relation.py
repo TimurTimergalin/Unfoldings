@@ -9,7 +9,7 @@ class Co:
         self.pairs = set()  # Отношение представляется в виде множества пар
 
     def __call__(self, f, s):
-        return (f, s) in self.pairs
+        return (f, s) in self.pairs or (s, f) in self.pairs
 
     # Обновляет отношение после добавления нового события
     # new_event - новое событие
@@ -28,9 +28,9 @@ class Co:
             else:  # Если `c` конкурентно со всеми условиями из preset-а нового события
                 concurrent_with.append(c)
 
-        self.pairs.update((x, y) for x, y in product(new, new))
+        self.pairs.update((x, y) for x, y in product(new, new) if x != y)
         self.pairs.update((x, y) for x, y in product(new, concurrent_with))
-        self.pairs.update((x, y) for x, y in product(concurrent_with, new))
+        # self.pairs.update((x, y) for x, y in product(concurrent_with, new))
 
         return concurrent_with
 
