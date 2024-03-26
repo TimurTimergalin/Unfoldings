@@ -4,9 +4,8 @@ from decorations import IdleDecorations
 from obj import Prefix
 from .event import NSafeEvent
 from .condition import NSafeCondition
-from .concurrency_relation import NSafeCo
 from .possible_extensions import update_possible_extensions
-from alg import PriorityQueue
+from alg import PriorityQueue, Co
 
 
 # Построение префикса
@@ -22,7 +21,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
     bot = e
     res.add_event(e)
 
-    co = NSafeCo()
+    co = Co()
     pe = PriorityQueue(order_settings.cmp_events)
 
     for p in net.places:
@@ -34,7 +33,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
 
     co.update(e, res.places)
     cutoff_settings.update(e, order_settings, mark=m0)
-    update_possible_extensions(pe, e, net.transitions, co)
+    update_possible_extensions(pe, e, res.places, co, net.transitions)
 
     count = 0
     finished = True
@@ -55,13 +54,12 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
             petri_utils.add_arc_from_to(e, c, res)
             decorations.add_condition(c)
 
-        co.update(e, res.places)
-
         is_cutoff, hint = cutoff_settings.check_cutoff(e, order_settings)
         decorations.add_event(e)
         if not is_cutoff:
+            concurrent_with = co.update(e, res.places)
             cutoff_settings.update(e, order_settings, **hint)
-            update_possible_extensions(pe, e, net.transitions, co)
+            update_possible_extensions(pe, e, concurrent_with, co)
             count += 1
             if event_count is not None and pe and count >= event_count:
                 finished = False

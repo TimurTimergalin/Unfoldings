@@ -40,7 +40,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
     # Обновление отношения co, очереди pe и словаря конфигураций
     co.update(e, res.places)
     cutoff_settings.update(e, order_settings, mark=m0)
-    update_possible_extensions(pe, e, net.transitions, co)
+    update_possible_extensions(pe, e, res.places, co, net.transitions)
 
     count = 0
     finished = True
@@ -53,22 +53,19 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
             petri_utils.add_arc_from_to(c, e, res)
 
         # Создаём условия, соответствующие позициям из post_set-а перехода, представленного выбранным событием
-        postset = set()
         for a in e.transition.out_arcs:
-            postset.add(a.target)
             for _ in range(a.weight):
                 c = Condition(a.target)
                 res.add_condition(c)
                 petri_utils.add_arc_from_to(e, c, res)
                 decorations.add_condition(c)
 
-        co.update(e, res.places)
         is_cutoff, hint = cutoff_settings.check_cutoff(e, order_settings)
         decorations.add_event(e)
         if not is_cutoff:
+            concurrent_with = co.update(e, res.places)
             cutoff_settings.update(e, order_settings, **hint)
-            transitions = set(chain.from_iterable(petri_utils.post_set(x) for x in postset))
-            update_possible_extensions(pe, e, transitions, co)
+            update_possible_extensions(pe, e, concurrent_with, co)
             count += 1
             if event_count is not None and pe and count >= event_count:
                 finished = False
