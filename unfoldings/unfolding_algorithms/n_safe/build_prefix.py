@@ -33,7 +33,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
     res.add_event(e)
 
     co = Co()
-    pe = PriorityQueue(order_settings.cmp_events)
+    pe = PriorityQueue(order_settings)
 
     # Начальные условия берутся из всех позиций изначальной сети
     for p in net.places:

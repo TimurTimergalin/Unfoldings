@@ -10,8 +10,12 @@ class PriorityQueue:
     будут составлять его preset.
     """
 
-    def __init__(self, events_cmp):  # event_cmp - функция сравнения событий
-        self.cmp = events_cmp
+    def __init__(self, order_settings):
+        """
+        :param order_settings: настройки порядка
+        """
+        self.cmp = order_settings.cmp_events
+        self.conf = order_settings.conf
         self.heap = []
 
     @staticmethod
@@ -32,6 +36,10 @@ class PriorityQueue:
     def _heapify_down(self, ind):
         if not self._in_bounds(ind):
             return
+
+        cv_config = self.conf(self.heap[ind][0])
+        lv_config = None
+        rv_config = None
         while True:
             li = self._left_child(ind)
             ri = self._right_child(ind)
@@ -40,12 +48,21 @@ class PriorityQueue:
             rv = self.heap[ri][0] if self._in_bounds(ri) else None
             cv = self.heap[ind][0]
 
-            if lv is not None and self.cmp(cv, lv) > 0 and (rv is None or self.cmp(rv, lv) >= 0):
+            if lv is not None:
+                lv_config = self.conf(lv)
+            if rv is not None:
+                rv_config = self.conf(rv)
+
+            if lv is not None and self.cmp(cv, lv, config1=cv_config, config2=lv_config) > 0 and (
+                    rv is None or self.cmp(rv, lv, config1=rv_config, config2=lv_config) >= 0):
                 self.heap[ind], self.heap[li] = self.heap[li], self.heap[ind]
                 ind = li
-            elif rv is not None and self.cmp(cv, rv) > 0 and (lv is None or self.cmp(lv, rv) >= 0):
+                cv_config = lv_config
+            elif rv is not None and self.cmp(cv, rv, config1=cv_config, config2=rv_config) > 0 and (
+                    lv is None or self.cmp(lv, rv, config1=lv_config, config2=rv_config) >= 0):
                 self.heap[ind], self.heap[ri] = self.heap[ri], self.heap[ind]
                 ind = ri
+                cv_config = rv_config
             else:
                 break
 

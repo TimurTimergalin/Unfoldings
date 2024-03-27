@@ -34,15 +34,13 @@ class LabelsDecorations(Decorations):
         Базовые декорации для n-safe алгоритма. Надписи условий будут иметь вид "{name}:{markers}", где name -
         имя позиции начальной сети, которой помечено условие, markers - количество маркеров в этой позиции, которому
         соответствует условию.
-        Аналогично, надписи событий будут иметь вид: "{name}{marking}"
-        :param inner:
+        Аналогично, надписи событий будут иметь вид: "{name}"
+        :param inner: внутренняя декорация (по умолчанию idle)
         :return:
         """
         return LabelsDecorations(inner,
                                  conditions=lambda c: f"{c.place.name}:{c.markers}",
-                                 events=lambda e: (f"{e.transition.name}"
-                                                   f"{dict((k.name, v) for k, v in e.marking.items())
-                                                   if e.marking is not None and e.transition is not None else ''}")
+                                 events=lambda e: f"{e.transition.name}"
                                  )
 
     def add_condition(self, c):
