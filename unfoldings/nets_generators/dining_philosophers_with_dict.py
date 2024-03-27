@@ -2,14 +2,13 @@ from pm4py.objects.petri_net.obj import PetriNet, Marking
 from pm4py.objects.petri_net.utils.petri_utils import add_arc_from_to, add_place, add_transition
 
 
-def generate_dining_philosophers(n, add_host=False):
+def generate_dining_philosophers_with_dict(n):
     """
-    Генерирует сеть Петри, моделирующую задачу об обедающих философах
+    Генерирует сеть Петри модели обедающих философов со словарем
     :param n: количество философов
-    :param add_host: если True, генерируется версия с хостом
-    :return: сеть Петри и её начальную разметку
+    :return: сеть Петри, начальная разметка
     """
-    net = PetriNet(f"Dining philosophers {n}")
+    net = PetriNet(f"Dining philosophers with dict {n}")
 
     def place(x):
         return add_place(net, x)
@@ -25,13 +24,21 @@ def generate_dining_philosophers(n, add_host=False):
     chopsticks = [place(f"chopstick{x}") for x in range(1, n + 1)]
     marking.update(chopsticks)
 
-    if add_host:
-        host = place("host")
-        marking[host] = n - 1
+    dicts = [place(f"dict{x}") for x in range(1, n + 1)]
+    no_dicts = [place(f"no dict{x}") for x in range(1, n + 1)]
+
+    marking[dicts[0]] += 1
+    marking.update(no_dicts[1:])
 
     for i in range(1, n + 1):
         chopstick1 = chopsticks[i - 1]
         chopstick2 = chopsticks[i % n]
+
+        my_no_dict = no_dicts[i - 1]
+        my_dict = dicts[i - 1]
+
+        next_no_dict = no_dicts[i % n]
+        next_dict = dicts[i % n]
 
         thinking = place(f"thinking{i}")
         prepare_left = place(f"prep l{i}")
@@ -47,11 +54,10 @@ def generate_dining_philosophers(n, add_host=False):
         take_right = trans(name := f"take r{i}", label=name)
         eat = trans(name := f"eat{i}", label=name)
         think = trans(name := f"think{i}", label=name)
+        pass_dict = trans(name := f"pass{i}", name)
 
         arc(thinking, prepare)
-        if add_host:
-            arc(host, prepare)
-
+        arc(my_no_dict, prepare)
         arc(prepare, prepare_left)
         arc(prepare, prepare_right)
 
@@ -71,8 +77,11 @@ def generate_dining_philosophers(n, add_host=False):
         arc(think, chopstick1)
         arc(think, chopstick2)
         arc(think, thinking)
+        arc(think, my_no_dict)
 
-        if add_host:
-            arc(think, host)
+        arc(my_dict, pass_dict)
+        arc(next_no_dict, pass_dict)
+        arc(pass_dict, my_no_dict)
+        arc(pass_dict, next_dict)
 
     return net, marking
