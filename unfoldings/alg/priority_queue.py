@@ -18,7 +18,7 @@ class PriorityQueue:
         подсказок config1 и config22
         """
         self.cmp = order_settings.cmp_events
-        self.conf = order_settings.conf
+        self.conf = order_settings.config
         self.heap = []
         self.optimise_local_config = optimise_local_config
 

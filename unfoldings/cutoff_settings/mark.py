@@ -8,7 +8,7 @@ class MarkCutoffSettings(CutoffSettings):
         self.min_by_mark = {}
 
     def check_cutoff(self, event, order_settings):
-        config = order_settings.conf(event)
+        config = order_settings.config(event)
         m = config.mark()
 
         return m in self.min_by_mark and order_settings.cmp_events(self.min_by_mark[m], event, config2=config) < 0, {
