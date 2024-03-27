@@ -5,7 +5,8 @@ from ..decorations import IdleDecorations
 from ..obj import Prefix, Event, Condition
 
 
-def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, event_count=None):
+def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, event_count=None,
+                 pe_optimise_local_config=True):
     """
     Строит канонический префикс развертки данной сети (при правильно определенном контексте срезания, за который
     отвечают аргументы order_settings и cutoff_settings)
@@ -15,6 +16,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
     :param cutoff_settings: настройки срезания
     :param decorations: декорации (опционально)
     :param event_count: максимальное количество событий в префиксе. Если построение префикса не закончится до того,
+    :param pe_optimise_local_config: аргумент для инициализации PriorityQueue
     как количество событий в префиксе превысит данное значение, построение префикса прекратится и значение флага
     finished будет False. Если не передать event_count, ограничения на количество событий не будет
     :return: префикс развертки
@@ -31,7 +33,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
     res.add_event(e)
 
     co = Co()
-    pe = PriorityQueue(order_settings)
+    pe = PriorityQueue(order_settings, optimise_local_config=pe_optimise_local_config)
 
     for p in m0.elements():  # Добавление условий, соответствующих начальной разметке
         c = Condition(p)

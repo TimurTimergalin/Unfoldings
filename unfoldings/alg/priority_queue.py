@@ -10,13 +10,17 @@ class PriorityQueue:
     будут составлять его preset.
     """
 
-    def __init__(self, order_settings):
+    def __init__(self, order_settings, optimise_local_config=True):
         """
         :param order_settings: настройки порядка
+        :param optimise_local_config: определяет, считать локальные конфигурации сравниваемых событий
+        заранее и передавать их как подсказки. Ускоряет работу алгоритма, если настройки порядка ускоряются при передаче
+        подсказок config1 и config22
         """
         self.cmp = order_settings.cmp_events
         self.conf = order_settings.conf
         self.heap = []
+        self.optimise_local_config = optimise_local_config
 
     @staticmethod
     def _left_child(ind):
@@ -37,7 +41,7 @@ class PriorityQueue:
         if not self._in_bounds(ind):
             return
 
-        cv_config = self.conf(self.heap[ind][0])
+        cv_config = self.conf(self.heap[ind][0]) if self.optimise_local_config else None
         lv_config = None
         rv_config = None
         while True:

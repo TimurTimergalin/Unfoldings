@@ -8,7 +8,8 @@ from ...decorations import IdleDecorations
 from ...obj import Prefix
 
 
-def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, event_count=None):
+def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, event_count=None,
+                 pe_optimise_local_config=True):
     """
     Строит канонический префикс развертки данной сети (при правильно определенном контексте срезания, за который
     отвечают аргументы order_settings и cutoff_settings)
@@ -21,6 +22,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
     как количество событий в префиксе превысит данное значение, построение префикса прекратится и значение флага
     finished будет False. Если не передать event_count, ограничения на количество событий не будет
     :return: префикс развертки
+    :param pe_optimise_local_config: аргумент для инициализации PriorityQueue
     """
     if event_count is not None and event_count <= 0:
         raise ValueError("event count must be positive")
@@ -33,7 +35,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
     res.add_event(e)
 
     co = Co()
-    pe = PriorityQueue(order_settings)
+    pe = PriorityQueue(order_settings, pe_optimise_local_config)
 
     # Начальные условия берутся из всех позиций изначальной сети
     for p in net.places:
