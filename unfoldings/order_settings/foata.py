@@ -71,7 +71,7 @@ def compare_lex(seq1, seq2):
     return 0
 
 
-def cmp_events(e1, e2, config_length, *, config1=None, config2=None, foata, **kwargs):
+def cmp_events(e1, e2, config_length, *, config1=None, config2=None, **kwargs):
     if config1 is not None and not config_length.calculated(e1):
         config_length.save(e1, len(config1))
     if config2 is not None and not config_length.calculated(e2):
@@ -99,7 +99,7 @@ def cmp_events(e1, e2, config_length, *, config1=None, config2=None, foata, **kw
     # Сравнение в лексикографическом порядке
     total_cmp = compare_lex(lex_order(c1), lex_order(c2))
 
-    if total_cmp != 0 or not foata:
+    if total_cmp != 0:
         return total_cmp
 
     # Сравнение нормальных форм
@@ -123,7 +123,7 @@ class FoataOrderSettings(OrderSettings):
     def __init__(self):
         config_length = ConfigLength(FoataConfiguration)
         self.conf = partial(FoataConfiguration, save_length=config_length)
-        self.cmp = partial(cmp_events, config_length=config_length, foata=True)
+        self.cmp = partial(cmp_events, config_length=config_length)
 
     def config(self, event):
         return self.conf(event)
@@ -136,17 +136,4 @@ class FoataOrderSettings(OrderSettings):
             будет использована config1.
             config2 - конфигурация e2. Используется аналогично config1
         """
-        return self.cmp(e1, e2, **kwargs)
-
-
-class TotalOrderSettings(OrderSettings):
-    def __init__(self):
-        config_length = ConfigLength(FoataConfiguration)
-        self.conf = partial(FoataConfiguration, save_length=config_length)
-        self.cmp = partial(cmp_events, config_length=config_length, foata=False)
-
-    def config(self, event):
-        return self.conf(event)
-
-    def cmp_events(self, e1, e2, **kwargs):
         return self.cmp(e1, e2, **kwargs)
