@@ -7,6 +7,13 @@ from pm4py.objects.petri_net.utils import petri_utils
 from ..obj import Event
 
 
+def check_coset(s, co):
+    for x, y in combinations(s, 2):
+        if not co(x, y):
+            return False
+    return True
+
+
 def update_possible_extensions(pe, new, c, co):
     """
     Обновление очереди возможных расширений после добавления нового события
@@ -45,6 +52,8 @@ def update_possible_extensions(pe, new, c, co):
                     break
             else:  # Если в выбранном coset-е нет новых элементов
                 continue  # то это расширение уже добавлено (если нужно)
+            if not check_coset(preset_conds, co):
+                continue
 
             cover(pe, t, preset_conds, co, c, preset_marking, n)
 
@@ -65,6 +74,8 @@ def cover(pe, t, preset_conds, co, c, preset_marking, n):
 
         possible_additions = [x for x in c if x.place == p]
         for choice in combinations(possible_additions, preset_marking[p]):
+            if not check_coset(choice, co):
+                continue
             new_c = [x for x in c if x not in choice and all(co(d, x) for d in choice)]
             preset_conds.extend(choice)
             cover(pe, t, preset_conds, co, new_c, preset_marking, n)

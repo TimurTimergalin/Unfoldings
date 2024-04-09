@@ -16,13 +16,12 @@
 
 from .abstract import OrderSettings, Configuration
 from .basic import BasicOrderSettings
-from .foata import FoataOrderSettings, TotalOrderSettings
+from .foata import FoataOrderSettings
 from .idle import IdleOrderSettings
 
 __all__ = [
     "BasicOrderSettings",
     "FoataOrderSettings",
-    "TotalOrderSettings",
     "OrderSettings",
     "Configuration",
     "IdleOrderSettings"
