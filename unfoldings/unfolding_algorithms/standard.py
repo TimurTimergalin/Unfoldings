@@ -6,7 +6,7 @@ from ..obj import Prefix, Event, Condition
 
 
 def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, event_count=None,
-                 pe_optimise_local_config=True):
+                 pe_optimise_local_config=True, order_of_adding=None):
     """
     Строит канонический префикс развертки данной сети (при правильно определенном контексте срезания, за который
     отвечают аргументы order_settings и cutoff_settings)
@@ -16,11 +16,15 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
     :param cutoff_settings: настройки срезания
     :param decorations: декорации (опционально)
     :param event_count: максимальное количество событий в префиксе. Если построение префикса не закончится до того,
-    :param pe_optimise_local_config: аргумент для инициализации PriorityQueue
     как количество событий в префиксе превысит данное значение, построение префикса прекратится и значение флага
     finished будет False. Если не передать event_count, ограничения на количество событий не будет
+    :param pe_optimise_local_config: аргумент для инициализации PriorityQueue
+    :param order_of_adding: список, в который будут сохранены события в порядке добавления к префиксу (опционально)
     :return: префикс развертки
     """
+    if order_of_adding is None:
+        order_of_adding = []
+
     if event_count is not None and event_count <= 0:
         raise ValueError("event count must be positive")
     if decorations is None:
@@ -54,6 +58,7 @@ def build_prefix(net, m0, order_settings, cutoff_settings, decorations=None, eve
 
         # Добавляем к префиксу выбранное событие и дуги к нему от условий в его preset-е
         res.add_event(e)
+        order_of_adding.append(e)
         for c in pre:
             petri_utils.add_arc_from_to(c, e, res)
 

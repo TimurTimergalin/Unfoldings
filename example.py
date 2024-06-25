@@ -12,8 +12,12 @@ decorations = ColorsDecorations(
     cutoff_events="#ffaaaa"
 )
 
-pr = standard_algorithm(net, m0, BasicOrderSettings(), MarkCutoffSettings(), decorations)
+events = []
+
+pr = standard_algorithm(net, m0, BasicOrderSettings(), MarkCutoffSettings(), decorations, order_of_adding=events)
 pm4py.view_petri_net(pr, decorations=decorations.get())
+
+print(events)
 
 rg = pm4py.objects.petri_net.utils.reachability_graph.construct_reachability_graph(net, m0)
 print(f"Reachability graph: {len(rg.states)} states, {len(rg.transitions)} transitions")
