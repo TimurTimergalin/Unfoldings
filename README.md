@@ -9,6 +9,7 @@
 │   LICENSE
 │   README.md
 |   example.py
+|   Results.pdf
 ├───nets_generators
 │   │   dining_philosophers.py
 │   │   dining_philosophers_with_dict.py
@@ -69,3 +70,5 @@
 6. `unfolding_algorithms` содержит в себе реализацию 2-х версий алгоритма Макмиллана - стандартный обобщенный (`standard.py`) и обобщенный алгоритм построения развертки сопряженной сети (папка `n_safe`)
 
 В `example.py` содержится пример использования библиотеки
+
+В `Results.pdf` содержатся результаты запуска алгоритмов на сетях из `nets_generators`
